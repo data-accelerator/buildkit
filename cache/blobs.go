@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"io"
 	"os"
+	"path"
 	"strconv"
 
 	"github.com/containerd/containerd/content"
@@ -123,7 +124,7 @@ func computeBlobChain(ctx context.Context, sr *immutableRef, createIfNeeded bool
 					lowerRef = sr.layerParent
 				}
 				var lower []mount.Mount
-				if lowerRef != nil {
+				if sr.cm.Snapshotter.Name() != "overlaybd" && lowerRef != nil {
 					m, err := lowerRef.Mount(ctx, true, s)
 					if err != nil {
 						return nil, err
@@ -146,7 +147,20 @@ func computeBlobChain(ctx context.Context, sr *immutableRef, createIfNeeded bool
 					upperRef = sr
 				}
 				var upper []mount.Mount
-				if upperRef != nil {
+				if sr.cm.Snapshotter.Name() == "overlaybd" {
+					snStat, err := sr.cm.Snapshotter.Stat(ctx, sr.getSnapshotID())
+					if err != nil {
+						return nil, err
+					}
+					fsPath := path.Dir(snStat.Labels[LabelLocalOverlayBDPath])
+					upper = []mount.Mount{
+						{
+							Source:  fsPath,
+							Type:    "bind",
+							Options: []string{"ro", "rbind"},
+						},
+					}
+				} else if upperRef != nil {
 					m, err := upperRef.Mount(ctx, true, s)
 					if err != nil {
 						return nil, err
@@ -233,6 +247,10 @@ func computeBlobChain(ctx context.Context, sr *immutableRef, createIfNeeded bool
 
 				if desc.Annotations == nil {
 					desc.Annotations = map[string]string{}
+				}
+				if sr.cm.Snapshotter.Name() == "overlaybd" {
+					desc.Annotations[labelKeyOverlayBDBlobDigest] = string(desc.Digest)
+					desc.Annotations[labelKeyOverlayBDBlobSize] = fmt.Sprintf("%d", desc.Size)
 				}
 				if finalize != nil {
 					a, err := finalize(ctx, sr.cm.ContentStore)

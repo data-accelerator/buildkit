@@ -14,6 +14,7 @@ import (
 	"github.com/containerd/containerd/filters"
 	"github.com/containerd/containerd/gc"
 	"github.com/containerd/containerd/leases"
+	"github.com/containerd/containerd/snapshots"
 	"github.com/docker/docker/pkg/idtools"
 	"github.com/moby/buildkit/cache/metadata"
 	"github.com/moby/buildkit/client"
@@ -611,6 +612,11 @@ func (cm *cacheManager) New(ctx context.Context, s ImmutableRef, sess session.Gr
 		}); rerr != nil {
 			return nil, rerr
 		}
+	} else if cm.Snapshotter.Name() == "overlaybd" && parent != nil {
+		rwLabels := make(map[string]string)
+		rwLabels["containerd.io/snapshot/overlaybd.writable"] = "dev"
+		logrus.Infof("Prepare writable dev")
+		err = cm.Snapshotter.Prepare(ctx, snapshotID, parentSnapshotID, snapshots.WithLabels(rwLabels))
 	} else {
 		err = cm.Snapshotter.Prepare(ctx, snapshotID, parentSnapshotID)
 	}

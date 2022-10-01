@@ -19,6 +19,7 @@ func SnapshotLabels(ref string, descs []ocispecs.Descriptor, targetIndex int) ma
 		labels[k] = desc.Annotations[k]
 	}
 	labels["containerd.io/snapshot/remote/stargz.reference"] = ref
+	labels["containerd.io/snapshot/image-ref"] = ref
 	labels["containerd.io/snapshot/remote/stargz.digest"] = desc.Digest.String()
 	var (
 		layersKey = "containerd.io/snapshot/remote/stargz.layers"
