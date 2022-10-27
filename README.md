@@ -1,3 +1,39 @@
+This is a customized buildkit for [overlaybd](https://github.com/containerd/accelerated-container-image) images.
+
+# Usage for overlaybd
+
+[overlaybd](https://github.com/containerd/accelerated-container-image) runtime have to be installed.
+
+
+```bash
+buildkitd --containerd-worker-snapshotter=overlaybd --oci-worker=false --containerd-worker=true
+```
+
+Here is an example.
+
+```bash
+buildctl build \
+    --frontend dockerfile.v0 \
+    --local context=. \
+    --local dockerfile=.  \
+    --output type=image,name={new image},push=true,oci-mediatypes=true,compression=uncompressed
+```
+
+`oci-mediatypes=true` and `compression=uncompressed` are required.
+
+The `FROM` in Dockerfile must be an overlaybd image.
+
+# Limitation for overlaybd
+
+* Must FROM an overlaybd image.
+* Accelerator layer is not supported yet.
+* Multi-fs support is not implemented, only ext4 is supported as default fs type.
+
+
+============================== origin buildkit readme ==============================
+
+
+
 [![asciicinema example](https://asciinema.org/a/gPEIEo1NzmDTUu2bEPsUboqmU.png)](https://asciinema.org/a/gPEIEo1NzmDTUu2bEPsUboqmU)
 
 # BuildKit <!-- omit in toc -->
@@ -346,7 +382,7 @@ BuildKit supports the following cache exporters:
 * `gha`: export to GitHub Actions cache
 
 In most case you want to use the `inline` cache exporter.
-However, note that the `inline` cache exporter only supports `min` cache mode. 
+However, note that the `inline` cache exporter only supports `min` cache mode.
 To enable `max` cache mode, push the image and the cache separately by using `registry` cache exporter.
 
 `inline` and `registry` exporters both store the cache in the registry. For importing the cache, `type=registry` is sufficient for both, as specifying the cache format is not necessary.
@@ -364,7 +400,7 @@ Note that the inline cache is not imported unless [`--import-cache type=registry
 
 Inline cache embeds cache metadata into the image config. The layers in the image will be left untouched compared to the image with no cache information.
 
-:information_source: Docker-integrated BuildKit (`DOCKER_BUILDKIT=1 docker build`) and `docker buildx`requires 
+:information_source: Docker-integrated BuildKit (`DOCKER_BUILDKIT=1 docker build`) and `docker buildx`requires
 `--build-arg BUILDKIT_INLINE_CACHE=1` to be specified to enable the `inline` cache exporter.
 However, the standalone `buildctl` does NOT require `--opt build-arg:BUILDKIT_INLINE_CACHE=1` and the build-arg is simply ignored.
 
