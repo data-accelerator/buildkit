@@ -6,7 +6,8 @@ This is a customized buildkit for [overlaybd](https://github.com/containerd/acce
 
 
 ```bash
-buildkitd --containerd-worker-snapshotter=overlaybd --oci-worker=false --containerd-worker=true
+buildkitd --oci-worker-snapshotter=overlaybd \
+    --oci-worker-proxy-snapshotter-path=/run/overlaybd-snapshotter/overlaybd.sock
 ```
 
 Here is an example.
