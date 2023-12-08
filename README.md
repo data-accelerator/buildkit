@@ -1,3 +1,56 @@
+# Buildkit for Overlaybd
+
+[Overlaybd](https://github.com/containerd/overlaybd) is a novel layering block-level image format, which is design for container, secure container and applicable to virtual machine. And it is an open-source implementation of paper [DADI: Block-Level Image Service for Agile and Elastic Application Deployment. USENIX ATC'20"](https://www.usenix.org/conference/atc20/presentation/li-huiba).
+
+## Build Overlaybd Images
+
+Before building overlaybd images, ensure that `overlaybd-tcmu` and `overlaybd-snapshotter` are active by referring to the [QUICKSTART](https://github.com/containerd/accelerated-container-image/blob/main/docs/QUICKSTART.md#install) guide.
+
+To use buildkit to build overlaybd images, you should specify `--oci-worker-snapshotter=overlaybd` and `--oci-worker-proxy-snapshotter-path=/run/overlaybd-snapshotter/overlaybd.sock` when start buildkitd:
+
+```bash
+buildkitd  --oci-worker-snapshotter=overlaybd  --oci-worker-proxy-snapshotter-path=/run/overlaybd-snapshotter/overlaybd.sock
+```
+
+After that, you can build a new overlaybd image from an existing overlaybd image. It is essential to include `--oci-mediatypes=true` and `--compression=uncompressed` while running buildctl:
+
+```bash
+buildctl build ... \
+--output type=image,name=<new image name>,push=true,oci-mediatypes=true,compression=uncompressed
+```
+
+This version is compatible with standard OCIv1 image builds. When building from an OCIv1 image, the output is an OCIv1 image, and when building from an OverlayBD image, the output is an OverlayBD image.
+
+
+## Limitation
+The FROM and the output image must be in the same registry.
+Accelerator layer is not supported yet.
+Multi-fs support is not implemented, only ext4 is supported as default fs type.
+
+
+## Performance
+
+In our test case Dockerfile, we used a 5GB OCI image (and corresponding overlaybd format), wrote some new layers of identical size, and recorded the time cost of image pull (as **pull** in the table below), building all lines in Dockerfile (as **build**), and exporting to image and pushing (as **push**).
+
+OCI:
+
+| **size per layer** | **layers** | **pull** | **build** | **push** | **total**  |
+| -------- | ---- | ---- | ----- | ---- | ---- |
+| 4GB      | 1    | 105.7| 23.5  | 219.4| 348.6|
+| 1GB      | 4    | 88.5 | 34.0  | 123.8| 246.3|
+| 256MB    | 10   | 92.1 | 20.7  | 63.6 | 176.4|
+
+Overlaybd:
+
+| **size per layer** | **layers** | **pull** | **build** | **push** | **total**  |
+| -------- | ---- | ---- | ----- | ---- | ---- |
+| 4GB      | 1    | 0.9  | 21.5  | 166.2| 188.6|
+| 1GB      | 4    | 0.9	 | 24.9	 | 72.9 | 98.7 |
+| 256MB    | 10   | 0.7  | 18.4  | 48.9 | 68.0 |
+
+
+
+
 [![asciicinema example](https://asciinema.org/a/gPEIEo1NzmDTUu2bEPsUboqmU.png)](https://asciinema.org/a/gPEIEo1NzmDTUu2bEPsUboqmU)
 
 # BuildKit <!-- omit in toc -->
@@ -401,7 +454,7 @@ BuildKit supports the following cache exporters:
 * `gha`: export to GitHub Actions cache
 
 In most case you want to use the `inline` cache exporter.
-However, note that the `inline` cache exporter only supports `min` cache mode. 
+However, note that the `inline` cache exporter only supports `min` cache mode.
 To enable `max` cache mode, push the image and the cache separately by using `registry` cache exporter.
 
 `inline` and `registry` exporters both store the cache in the registry. For importing the cache, `type=registry` is sufficient for both, as specifying the cache format is not necessary.
@@ -419,7 +472,7 @@ Note that the inline cache is not imported unless [`--import-cache type=registry
 
 Inline cache embeds cache metadata into the image config. The layers in the image will be left untouched compared to the image with no cache information.
 
-:information_source: Docker-integrated BuildKit (`DOCKER_BUILDKIT=1 docker build`) and `docker buildx`requires 
+:information_source: Docker-integrated BuildKit (`DOCKER_BUILDKIT=1 docker build`) and `docker buildx`requires
 `--build-arg BUILDKIT_INLINE_CACHE=1` to be specified to enable the `inline` cache exporter.
 However, the standalone `buildctl` does NOT require `--opt build-arg:BUILDKIT_INLINE_CACHE=1` and the build-arg is simply ignored.
 
