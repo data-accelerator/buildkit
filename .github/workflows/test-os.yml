@@ -81,7 +81,7 @@ jobs:
       -
         name: Upload test reports
         if: always()
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: test-reports
           path: ./bin/testreports
@@ -108,7 +108,7 @@ jobs:
             *.platform=freebsd/amd64
       -
         name: Upload artifacts
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: buildkit-freebsd-amd64
           path: ${{ env.DESTDIR }}/*
