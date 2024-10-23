@@ -1,0 +1,22 @@
+[Unit]
+Description=buildkit-overlaybd service
+After=network.target local-fs.target
+Before=shutdown.target
+DefaultDependencies=no
+Conflicts=shutdown.target
+
+[Service]
+LimitNOFILE=1048576
+LimitCORE=infinity
+Type=simple
+ExecStartPre=modprobe overlay
+ExecStart=/usr/bin/buildkitd --oci-worker-snapshotter=overlaybd --oci-worker-proxy-snapshotter-path=/run/overlaybd-snapshotter/overlaybd.sock
+
+GuessMainPID=no
+Restart=always
+RestartSec=1s
+KillMode=process
+OOMScoreAdjust=-999
+
+[Install]
+WantedBy=multi-user.target

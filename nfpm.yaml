@@ -1,0 +1,31 @@
+# nfpm example config file
+#
+# check https://nfpm.goreleaser.com/configuration for detailed usage
+#
+name: "buildkit-overlaybd"
+arch: amd64
+platform: linux
+version: 0.1.0
+release: 1
+section: "default"
+priority: "extra"
+
+maintainer: "overlaybd authors"
+description: |
+  Buildkit for Overlaybd
+vendor: "overlaybd"
+homepage: "https://github.com/data-accelerator/buildkit"
+license: "Apache-2.0"
+contents:
+- src: ./bin/build/*
+  dst: /usr/bin/
+- src: ./dadi-gen
+  dst: /usr/bin/dadi-gen
+- src: ./buildkit-overlaybd.service
+  dst: /opt/overlaybd/buildkit-overlaybd.service
+  type: config
+overrides:
+  rpm:
+    scripts:
+  deb:
+    scripts:
