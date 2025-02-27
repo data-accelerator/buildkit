@@ -1371,7 +1371,7 @@ func (sr *immutableRef) unlazyLayer(ctx context.Context, dhs DescHandlers, pg pr
 
 	if sr.cm.Snapshotter.Name() == "overlaybd" {
 		err = sr.cm.Snapshotter.Prepare(ctx, key, parentID,
-			snapshots.WithLabels(map[string]string{"containerd.io/snapshot.ref": string(desc.Digest)}))
+			snapshots.WithLabels(map[string]string{"containerd.io/snapshot.ref": string(sr.getChainID())}))
 	} else {
 		err = sr.cm.Snapshotter.Prepare(ctx, key, parentID)
 	}
