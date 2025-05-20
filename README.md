@@ -1,5 +1,7 @@
 # Buildkit for Overlaybd
 
+This repository is deprecated. [moby/buildKit](https://github.com/moby/buildkit), starting from version v0.22.0-rc1, now natively supports overlaybd image building.
+
 [Overlaybd](https://github.com/containerd/overlaybd) is a novel layering block-level image format, which is design for container, secure container and applicable to virtual machine. And it is an open-source implementation of paper [DADI: Block-Level Image Service for Agile and Elastic Application Deployment. USENIX ATC'20"](https://www.usenix.org/conference/atc20/presentation/li-huiba).
 
 ## Build Overlaybd Images
