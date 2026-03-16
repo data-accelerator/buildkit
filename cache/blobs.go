@@ -529,7 +529,7 @@ func commitOverlayBD(ctx context.Context, sr *immutableRef, desc *ocispecs.Descr
 	}
 	dir := path.Dir(bdPath)
 	commitPath := path.Join(dir, "overlaybd.commit")
-	err = obdcmd.Commit(ctx, dir, dir, true, "-t", "-z", "-f")
+	err = obdcmd.Commit(ctx, dir, dir, true, "-z", "-f")
 	if err != nil {
 		return errors.Wrapf(err, "failed to overlaybd-commit")
 	}
