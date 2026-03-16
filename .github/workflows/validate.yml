@@ -57,6 +57,6 @@ jobs:
           buildkitd-flags: --debug
       -
         name: Validate
-        uses: docker/bake-action@v4
+        uses: docker/bake-action@v7
         with:
           targets: ${{ matrix.target }}
