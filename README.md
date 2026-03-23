@@ -1,3 +1,7 @@
+# Notice
+
+This repository is deprecated. Please use the upstream repository moby/buildkit to build overlaybd images.
+
 [![asciicinema example](https://asciinema.org/a/gPEIEo1NzmDTUu2bEPsUboqmU.png)](https://asciinema.org/a/gPEIEo1NzmDTUu2bEPsUboqmU)
 
 # BuildKit <!-- omit in toc -->
@@ -427,7 +431,7 @@ BuildKit supports the following cache exporters:
 * `gha`: export to GitHub Actions cache
 
 In most case you want to use the `inline` cache exporter.
-However, note that the `inline` cache exporter only supports `min` cache mode. 
+However, note that the `inline` cache exporter only supports `min` cache mode.
 To enable `max` cache mode, push the image and the cache separately by using `registry` cache exporter.
 
 `inline` and `registry` exporters both store the cache in the registry. For importing the cache, `type=registry` is sufficient for both, as specifying the cache format is not necessary.
@@ -445,7 +449,7 @@ Note that the inline cache is not imported unless [`--import-cache type=registry
 
 Inline cache embeds cache metadata into the image config. The layers in the image will be left untouched compared to the image with no cache information.
 
-:information_source: Docker-integrated BuildKit (`DOCKER_BUILDKIT=1 docker build`) and `docker buildx`requires 
+:information_source: Docker-integrated BuildKit (`DOCKER_BUILDKIT=1 docker build`) and `docker buildx`requires
 `--build-arg BUILDKIT_INLINE_CACHE=1` to be specified to enable the `inline` cache exporter.
 However, the standalone `buildctl` does NOT require `--opt build-arg:BUILDKIT_INLINE_CACHE=1` and the build-arg is simply ignored.
 
