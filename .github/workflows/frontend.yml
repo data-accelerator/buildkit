@@ -50,7 +50,7 @@ jobs:
       -
         name: Set outputs
         id: set
-        uses: actions/github-script@v8
+        uses: actions/github-script@v9
         env:
           INPUT_REF: ${{ github.ref }}
           INPUT_CHANNELS: |

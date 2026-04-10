@@ -175,7 +175,7 @@ jobs:
       -
         name: Set outputs
         id: set
-        uses: actions/github-script@v8
+        uses: actions/github-script@v9
         env:
           INPUT_DEFAULT-BASE: alpine
           INPUT_REF: ${{ github.ref }}
